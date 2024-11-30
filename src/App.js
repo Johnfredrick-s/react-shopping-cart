@@ -1,24 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import { Route, Routes } from "react-router-dom";
+import WebHeader from "./components/Header/WebHeader";
+import Products from "./pages/Products";
+import Layout from "./pages/Layout";
+import ProductDetail from "./pages/ProductDetail";
+import Login from "./pages/Login";
+import { useEffect, useState } from "react";
+import { CartItems } from "./libs/context/CartItems";
+import { geCartItems } from "./libs/api";
+
 
 function App() {
+
+  const [cart,setCart] = useState([])
+
+  useEffect(()=>{
+    const carts = async () => {
+      // const data = await geCartItems()
+      let data = localStorage['cart_items'] ? JSON.parse(localStorage['cart_items']) : null
+      if(data){
+        setCart(data)
+      }else{
+        setCart([])
+      }
+    }
+
+    carts()
+  },[])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+    <CartItems.Provider value={{cart,setCart}}>
+      <WebHeader />
+      <Routes>
+        <Route path="/" element={<Products />} />
+        {/* <Route path="/" element={<Layout />} /> */}
+        {/* <Route index element={<Home />} /> */}
+        <Route path="products" element={<Products />} />
+        <Route path="login" element={<Login />} />
+        <Route path="products/:id" element={<ProductDetail />} />
+      </Routes>
+    </CartItems.Provider>
+
+    </>
   );
 }
 
